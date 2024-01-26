@@ -1,9 +1,11 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
+﻿using System;
+using System.Globalization; //DateTime
+using System.Text.RegularExpressions; //RegEx
+using System.IO;
 
 int menu = 0;
 
-while (menu > 6)
+while (menu != 7)
 {
     Console.WriteLine("+-------------------------------------+");
     Console.WriteLine("| 1. Alta Usuari                      |");
@@ -21,44 +23,67 @@ while (menu > 6)
     {
         case 1:
             Console.WriteLine("\n" + "Entra el teu nom: ");
-            string nom = Console.ReadLine();
-            Nom(nom);
+            string nom;
+            do
+            {
+                nom = Console.ReadLine();
+            } while (!Nom(nom));
 
             Console.WriteLine("\n" + "Entra el teu primer cognom: ");
-            string cognom = Console.ReadLine();
-            Cognom(cognom);
+            string cognom;
+            do
+            {
+                cognom = Console.ReadLine();
+            } while (!Cognom(cognom));
 
             Console.WriteLine("\n" + "Entra el teu DNI: ");
-            string dni = Console.ReadLine();
-            DNI(dni);
+            string dni;
+            do
+            {
+                dni = Console.ReadLine();
+            } while (!DNI(dni));
 
             Console.WriteLine("\n" + "Entra el teu numero de telefon: ");
-            string telefon = Console.ReadLine();
-            Telefon(telefon);
+            string telefon;
+            do
+            {
+                telefon = Console.ReadLine();
+            } while (!Telefon(telefon));
 
             Console.WriteLine("\n" + "Entra la teva data de naixement (DD/MM/AAAA): ");
-            string data = Console.ReadLine();
-            DMA(data);
+            string data;
+            do
+            {
+                data = Console.ReadLine();
+            } while (!DMA(data));
 
             Console.WriteLine("\n" + "Entra el teu correu electronic: ");
-            string mail = Console.ReadLine();
-            GMAIL(mail);
+            string mail;
+            do
+            {
+                mail = Console.ReadLine();
+            } while (!GMAIL(mail));
 
+            TornarMenu();
+
+            Console.WriteLine("La Informació es aquesta: ");
+            Console.WriteLine("\n");
+            Console.WriteLine("El nom: " + nom);
+            Console.WriteLine("\n");
+            Console.WriteLine("El cognom: " + cognom);
+            Console.WriteLine("\n");
+            Console.WriteLine("El DNI: " + dni);
+            Console.WriteLine("\n");
+            Console.WriteLine("El Telefon: " + telefon);
+            Console.WriteLine("\n");
+            Console.WriteLine("Data de naixement: " + data);
+            Console.WriteLine("\n");
+            Console.WriteLine("El correu electronic: " + mail);
+            string escriure = nom + ";" + cognom + ";" + dni + ";" + telefon + ";" + data + ";" + mail;
+            GuardarAgenda(escriure);
             TornarMenu();
             break;
         case 2:
-
-            break;
-        case 3:
-
-            break;
-        case 4:
-
-            break;
-        case 5:
-
-            break;
-        case 6:
 
             break;
     }
@@ -78,55 +103,48 @@ static bool Nom(string Nom)
     bool correcte = true;
     for (int i = 0; i < Nom.Length; i++)
     {
-        if (Nom[i] < 'a' || Nom[i] > 'Z')
+        if (!(Nom[i] >= 'a' && Nom[i] <= 'z') && !(Nom[i] >= 'A' && Nom[i] <= 'Z'))
         {
             correcte = false;
         }
     }
     return correcte;
 }
+
 static bool Cognom(string Cognom)
 {
     bool correcte = true;
     for (int i = 0; i < Cognom.Length; i++)
     {
-        if (Cognom[i] < 'a' || Cognom[i] > 'Z')
+        if (!(Cognom[i] >= 'a' && Cognom[i] <= 'z') && !(Cognom[i] >= 'A' && Cognom[i] <= 'Z'))
         {
             correcte = false;
         }
     }
     return correcte;
 }
+
 static bool DNI(string DNI)
 {
-    bool correcte = true;
-    for (int i = 0; i <= 8; i++)
-    {
-        if (DNI[i] > 9 || DNI[i] < 0)
-        {
-            correcte = false;
-        }
-    }
-    if (DNI[9] < 'a' || DNI[9] > 'Z')
-    {
-        correcte = false;
-    }
-    return correcte;
+    string patron = @"^\d{8}[A-Z]$";
+    return Regex.IsMatch(DNI, patron);
 }
 static bool Telefon(string telefon)
 {
     bool correcte = true;
-    for (int i = 0; i <= 9; i++)
+    for (int i = 0; i < telefon.Length; i++)
     {
-        if (telefon[i] > 9 || telefon[i] < 0)
+        if (telefon[i] < '0' || telefon[i] > '9')
         {
             correcte = false;
+            break;
         }
     }
     if (telefon.Length != 9)
     {
         correcte = false;
     }
+
     return correcte;
 }
 static bool DMA(string data)
@@ -134,7 +152,6 @@ static bool DMA(string data)
     bool correcte = false;
     if (DateTime.TryParseExact(data, "dd/MM/yyyy", null, DateTimeStyles.None, out DateTime fecha))
     {
-        Console.WriteLine("Fecha ingresada: " + fecha.ToString("dd/MM/yyyy"));
         correcte = true;
     }
     return correcte;
@@ -144,4 +161,10 @@ static bool GMAIL(string correo)
     string patron = @"^[a-z0-9]{3,}@[a-z]{3,}$";
     Regex regex = new Regex(patron, RegexOptions.IgnoreCase);
     return regex.IsMatch(correo);
+}
+static void GuardarAgenda(string escriure)
+{
+    StreamWriter Agenda = new StreamWriter("Agenda",true);
+    Agenda.WriteLine(escriure);
+    Agenda.Close();
 }
