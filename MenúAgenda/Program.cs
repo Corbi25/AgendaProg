@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization; //DateTime
 using System.Text.RegularExpressions; //RegEx
-using System.IO;
+using System.IO; //Ficher
 
 int menu = 0;
 
@@ -22,45 +22,45 @@ while (menu != 7)
     switch (menu)
     {
         case 1:
-            Console.WriteLine("\n" + "Entra el teu nom: ");
             string nom;
             do
             {
+                Console.WriteLine("\n" + "Entra el teu nom: ");
                 nom = Console.ReadLine();
             } while (!Nom(nom));
 
-            Console.WriteLine("\n" + "Entra el teu primer cognom: ");
             string cognom;
             do
             {
+                Console.WriteLine("\n" + "Entra el teu primer cognom: ");
                 cognom = Console.ReadLine();
             } while (!Cognom(cognom));
 
-            Console.WriteLine("\n" + "Entra el teu DNI: ");
             string dni;
             do
             {
+                Console.WriteLine("\n" + "Entra el teu DNI: ");
                 dni = Console.ReadLine();
             } while (!DNI(dni));
 
-            Console.WriteLine("\n" + "Entra el teu numero de telefon: ");
             string telefon;
             do
             {
+                Console.WriteLine("\n" + "Entra el teu numero de telefon: ");
                 telefon = Console.ReadLine();
             } while (!Telefon(telefon));
 
-            Console.WriteLine("\n" + "Entra la teva data de naixement (DD/MM/AAAA): ");
             string data;
             do
             {
+                Console.WriteLine("\n" + "Entra la teva data de naixement (DD/MM/AAAA): ");
                 data = Console.ReadLine();
             } while (!DMA(data));
 
-            Console.WriteLine("\n" + "Entra el teu correu electronic: ");
             string mail;
             do
             {
+                Console.WriteLine("\n" + "Entra el teu correu electronic: ");
                 mail = Console.ReadLine();
             } while (!GMAIL(mail));
 
@@ -76,7 +76,7 @@ while (menu != 7)
             Console.WriteLine("\n");
             Console.WriteLine("El Telefon: " + telefon);
             Console.WriteLine("\n");
-            Console.WriteLine("Data de naixement: " + data);
+            Console.WriteLine("Data de naixement: " + data + " (Actual edat de : )");
             Console.WriteLine("\n");
             Console.WriteLine("El correu electronic: " + mail);
             string escriure = nom + ";" + cognom + ";" + dni + ";" + telefon + ";" + data + ";" + mail;
@@ -84,7 +84,13 @@ while (menu != 7)
             TornarMenu();
             break;
         case 2:
-
+            string buscar;
+            do
+            {
+                Console.WriteLine("Anem a buscar algun contacte: ");
+                buscar = Console.ReadLine();
+            } while (!Buscar(buscar));
+            TornarMenu();
             break;
     }
 }
@@ -110,7 +116,6 @@ static bool Nom(string Nom)
     }
     return correcte;
 }
-
 static bool Cognom(string Cognom)
 {
     bool correcte = true;
@@ -123,7 +128,6 @@ static bool Cognom(string Cognom)
     }
     return correcte;
 }
-
 static bool DNI(string DNI)
 {
     string patron = @"^\d{8}[A-Z]$";
@@ -167,4 +171,53 @@ static void GuardarAgenda(string escriure)
     StreamWriter Agenda = new StreamWriter("Agenda",true);
     Agenda.WriteLine(escriure);
     Agenda.Close();
+}
+static bool Buscar(string buscar)
+{
+    StreamReader Agenda = new StreamReader("Agenda");
+    bool trobat = false;
+
+    while (!Agenda.EndOfStream && !trobat)
+    {
+        string AgendaString = Agenda.ReadLine();
+        string[] parts = AgendaString.Split(';');
+
+        if (parts[0] == buscar)
+        {
+            trobat = true;
+            Console.Clear();
+            Console.WriteLine("Tenim un contacte!");
+            Console.WriteLine("\r");
+            Console.WriteLine("La Informació es aquesta: ");
+            Console.WriteLine("\n");
+            Console.WriteLine("El nom: " + parts[0]);
+            Console.WriteLine("\n");
+            Console.WriteLine("El cognom: " + parts[1]);
+            Console.WriteLine("\n");
+            Console.WriteLine("El DNI: " + parts[2]);
+            Console.WriteLine("\n");
+            Console.WriteLine("El Telefon: " + parts[3]);
+            Console.WriteLine("\n");
+            Console.WriteLine("Data de naixement: " + parts[4] + " (Actual edat de : )");
+            Console.WriteLine("\n");
+            Console.WriteLine("El correu electronic: " + parts[5]);
+        }
+    }
+    if (trobat == false)
+    {
+        Console.WriteLine("L'usuari no existeix, vols tornar a buscar? (s/n)");
+        string tornar = Console.ReadLine();
+        if (tornar == "s")
+        {
+            Console.WriteLine("Entra el nou usuari a buscar: ");
+            buscar = Console.ReadLine();
+            Buscar(buscar);
+        }
+        else
+        {
+            trobat = true;
+        }
+    }
+    Agenda.Close();
+    return trobat;
 }
